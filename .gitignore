@@ -1,0 +1,34 @@
+# Python 缓存与构建产物
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 本地虚拟环境与环境变量
+.venv/
+venv/
+env/
+.env
+.env.*
+!.env.example
+
+# 编辑器与系统临时文件
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.ipynb_checkpoints/
+
+# 可重新生成的渲染输出；assets/ 内的示例图保持跟踪
+/outputs/
+/poincare_inversion_correspondence.png
+/poincare_face_shading_2_adaptive_rainbow.png
+*.log
