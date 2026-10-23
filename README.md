@@ -1,10 +1,34 @@
 # Abstract-Algebra
 
-抽象代数相关的计算实验与几何可视化。当前收录庞加莱圆盘与上半平面的对应着色程序，展示双曲测地线反射、Möbius 变换及圆弧分区的层次结构。
+抽象代数相关的计算实验与几何可视化。收录庞加莱圆盘与上半平面的对应着色，以及 SL₂(ℤ) 基本域的独立互动展开，展示 Möbius 变换、双曲测地线及逐区域色彩层次。
 
 ![庞加莱圆盘与上半平面的自适应彩虹着色](assets/poincare_adaptive_rainbow.png)
 
-## 当前功能
+## SL₂(ℤ) 互动展开
+
+下载 [sl2z/index.html](sl2z/index.html)，用浏览器打开即可离线探索。页面已包含全部样式、几何、互动和着色代码。
+
+- 逐区前进／后退、区域滑杆、点选整数矩阵、尖点和最短字长。
+- 深度 0–18 展开、自动逐层展开、S/T/T⁻¹、聚焦、撤回选区、复位和缩放。
+- 自适应彩虹、青蓝深海、紫兰暮光；逐区域基色、深度色移、内部柔光和邻域协调描线。
+- 保持已有区域颜色稳定，支持同层区域色差和底部微小区域上色。
+- 键盘、鼠标拖动与双指缩放，当前视野 SVG 和三倍分辨率 PNG 导出。
+
+![逐区域与深度渐变](assets/sl2z_h_gradients.png)
+
+[互动与快捷键](sl2z/README.md) · [数学结构](docs/SL2Z_MATHEMATICS.md) · [着色方法](docs/SL2Z_COLOR_GRADIENTS.md)
+
+构建及检查：
+
+    python3 scripts/build_sl2z.py
+    npm ci
+    npm test
+
+青蓝静态参考图由 scripts/render_sl2z.py 复现，输出位于 outputs/sl2z；
+互动版的 SVG/PNG 导出使用当前选择的颜色与视野。
+深度 18 累计 35,416 个区域，逐区基色由固定颜色表保持稳定。
+
+## 庞加莱对应着色功能
 
 - 左右两幅图共享区域标签、颜色查找表与内部光场，通过 Cayley 变换保持空间对应。
 - 填充色由分隔深度、相对径向位置、角位置和确定性的区域相位共同决定。
@@ -48,3 +72,4 @@ python poincare_face_shading_2.py --help
 | [assets/poincare_adaptive_rainbow.png](assets/poincare_adaptive_rainbow.png) | 已提交的高分辨率示例图 |
 
 分隔深度是相对于基点、由当前绘制圆弧计算的计数。分区和微小区域填充采用有限栅格近似；完整定义及使用边界见[方法说明](docs/POINCARE_SHADING.md)。
+

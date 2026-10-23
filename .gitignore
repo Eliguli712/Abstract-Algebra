@@ -32,3 +32,14 @@ Thumbs.db
 /poincare_inversion_correspondence.png
 /poincare_face_shading_2_adaptive_rainbow.png
 *.log
+
+# 互动页面开发依赖与本地导出
+node_modules/
+.npm/
+.cache/
+coverage/
+test-results/
+playwright-report/
+*.tgz
+/sl2z/exports/
+

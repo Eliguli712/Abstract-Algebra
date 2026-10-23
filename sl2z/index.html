@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="zh-Hans"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"><title>SL₂(ℤ) · 模群的上半平面</title>
+<style>:root{color-scheme:dark;--background:#0b1525;--foreground:#dceaf4;--border:#31475d;--viz-series-1:#81cce5;--viz-series-2:#e8c67b}
+*{box-sizing:border-box}
+body{margin:0;background:#070d18;color:var(--foreground);font:14px/1.6 system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1320px;margin:0 auto;padding:28px 24px}
+header{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}
+header p{margin:0;color:#9eb6c9}
+h1{font-weight:500;font-size:28px;margin:0 0 8px}
+h3{font-size:16px;font-weight:500;margin:0 0 14px}
+button,input,select{font:inherit}
+.btn,.form-select{background:#132238;color:var(--foreground);border:1px solid #3a536b;border-radius:8px;padding:8px 12px;min-height:40px}
+.btn{cursor:pointer;white-space:nowrap}
+.btn:hover,.form-select:hover{background:#20354e}
+.btn:disabled{opacity:.4;cursor:default}
+.btn[aria-pressed=true]{background:#294456;border-color:#80b7cb}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid #e8c67b;outline-offset:3px}
+.viz-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}
+.form-label{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.form-range{accent-color:#8dc8db;min-width:0;cursor:pointer}
+.form-select{width:100%}
+.text-small{font-size:12px}
+.extra-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:18px 0}
+.control-block{min-width:0}
+.control-block label{display:flex;justify-content:space-between;color:#adc1d0;font-size:13px;margin-bottom:7px}
+.control-block input{width:100%}
+.region-control{display:flex;align-items:center;gap:9px;flex:1 1 250px;min-width:0}
+.region-control input{flex:1;min-width:30px}
+.region-control span{white-space:nowrap;font-size:12px;color:#adc1d0}
+#sl2z-upper-half-plane .sl2z-standard{fill:none;stroke:#e8c67b}
+#sl2z-upper-half-plane .sl2z-selection{fill:#81cce5;fill-opacity:.12;stroke:#e9f5ff}
+.sl2z-legend{color:#adc1d0}
+[hidden]{display:none!important}
+.help{margin-top:22px;border-top:1px solid var(--border);padding-top:16px;color:#adc1d0;font-size:13px}
+.help summary{cursor:pointer}
+.math-note{margin:22px 0 0;color:#adc1d0;font-size:13px}
+footer{margin-top:22px;color:#7e99af;font-size:12px}
+@media(max-width:600px){
+main{padding:20px 12px}h1{font-size:24px}header{display:block}
+.extra-controls{grid-template-columns:1fr;gap:13px}
+.btn,.form-select{min-height:44px}
+.form-select{font-size:16px}
+.form-range{min-height:28px}
+.region-control{flex-basis:100%}
+.step-controls .btn{flex:1}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body><main>
+<header><div><h1>模群的上半平面</h1><p>从标准基本域展开，追踪每一块区域的色彩与整数矩阵。</p></div><p>SL₂(ℤ) / ℍ</p></header>
+<div id="sl2z-upper-half-plane">
+  <h3>上半平面的模群铺砌</h3>
+  <div class="viz-controls">
+    <label class="form-label" for="sl2z-depth">展开深度（字长） <span id="sl2z-depth-value" class="tabular-nums">16</span>
+      <input id="sl2z-depth" class="form-range" type="range" min="0" max="18" step="1" value="16">
+    </label>
+    <span class="text-small" id="sl2z-count"></span>
+  </div>
+  <div class="sl2z-plot"></div>
+<div class="extra-controls">
+  <div class="control-block">
+    <label for="sl2z-palette">色彩预设</label>
+    <select class="form-select" id="sl2z-palette">
+      <option value="rainbow">自适应彩虹</option>
+      <option value="cyan">青蓝深海</option>
+      <option value="orchid">紫兰暮光</option>
+    </select>
+  </div>
+  <div class="control-block">
+    <label for="sl2z-region-mix">区域色差 <span id="sl2z-region-value">55%</span></label>
+    <input class="form-range" id="sl2z-region-mix" type="range" min="0" max="100" value="55">
+  </div>
+  <div class="control-block">
+    <label for="sl2z-depth-mix">深度色移 <span id="sl2z-depth-mix-value">65%</span></label>
+    <input class="form-range" id="sl2z-depth-mix" type="range" min="0" max="100" value="65">
+  </div>
+</div>
+<div class="viz-controls step-controls">
+  <button type="button" class="btn" id="sl2z-previous">上一块</button>
+  <label class="region-control">逐区 <span id="sl2z-region-count"></span>
+    <input class="form-range" id="sl2z-region" type="range" min="0" max="13523" value="0">
+  </label>
+  <button type="button" class="btn" id="sl2z-next">下一块</button>
+  <button type="button" class="btn" id="sl2z-focus">聚焦当前</button>
+  <button type="button" class="btn" id="sl2z-undo" disabled>撤回选区</button>
+</div>
+<div class="viz-controls">
+  <button type="button" class="btn" id="sl2z-less">少一层 [</button>
+  <button type="button" class="btn" id="sl2z-more">多一层 ]</button>
+  <button type="button" class="btn" id="sl2z-play" aria-pressed="false">自动展开</button>
+  <button type="button" class="btn" id="sl2z-reset">复位</button>
+  <button type="button" class="btn" id="sl2z-fills" aria-pressed="true">填充</button>
+  <button type="button" class="btn" id="sl2z-lines" aria-pressed="true">描线</button>
+  <button type="button" class="btn" id="sl2z-glow" aria-pressed="true">柔光</button>
+  <button type="button" class="btn" id="sl2z-export-svg">导出 SVG</button>
+  <button type="button" class="btn" id="sl2z-export-png">导出 PNG</button>
+</div>
+
+  <div class="viz-controls">
+    <button type="button" class="btn" data-generator="S" data-tooltip="S：z ↦ −1/z">施加 S</button>
+    <button type="button" class="btn" data-generator="T" data-tooltip="T：z ↦ z + 1">施加 T</button>
+    <button type="button" class="btn" data-generator="Ti" data-tooltip="T⁻¹：z ↦ z − 1">施加 T⁻¹</button>
+    <button type="button" class="btn btn-ghost" id="sl2z-in" aria-label="放大当前区域">放大</button>
+    <button type="button" class="btn btn-ghost" id="sl2z-out" aria-label="缩小视野">缩小</button>
+  </div>
+  <div class="sl2z-legend text-small">
+    <span><i class="sl2z-swatch standard"></i>标准基本域 ℱ</span>
+    <span><i class="sl2z-swatch selected"></i>选中区域 gℱ</span>
+    <span>点选 · 拖动 · 双指缩放</span>
+  </div>
+  <div id="sl2z-selected" class="text-small tabular-nums" aria-live="polite"></div>
+</div>
+<style>
+  #sl2z-upper-half-plane { color:var(--foreground); width:100%; }
+  #sl2z-upper-half-plane .sl2z-plot { width:100%; margin:8px 0; }
+  #sl2z-upper-half-plane .sl2z-diagram { display:block; width:100%; touch-action:none; overflow:visible; }
+  #sl2z-upper-half-plane .sl2z-diagram text { fill:var(--foreground); font-size:12px; font-weight:400; }
+  #sl2z-upper-half-plane .sl2z-legend { display:flex; gap:14px; flex-wrap:wrap; margin:10px 0 8px; }
+  #sl2z-upper-half-plane .sl2z-legend span { display:inline-flex; align-items:center; gap:6px; }
+  #sl2z-upper-half-plane .sl2z-swatch { display:inline-block; width:12px; height:12px; }
+  #sl2z-upper-half-plane .sl2z-swatch.standard { background:var(--viz-series-2); opacity:.65; }
+  #sl2z-upper-half-plane .sl2z-swatch.selected { background:var(--viz-series-1); opacity:.65; }
+  #sl2z-upper-half-plane #sl2z-selected { overflow-wrap:anywhere; min-height:1.5em; }
+  #sl2z-upper-half-plane .sl2z-frame { fill:none; stroke:var(--border); stroke-width:1; }
+  #sl2z-upper-half-plane .sl2z-structure { fill:none; stroke:var(--foreground); stroke-opacity:.38; stroke-width:.65; }
+  #sl2z-upper-half-plane .sl2z-fills { fill:var(--viz-series-1); fill-opacity:.065; stroke:none; }
+  #sl2z-upper-half-plane .sl2z-standard { fill:var(--viz-series-2); fill-opacity:.13; stroke:var(--viz-series-2); stroke-width:1.5; }
+  #sl2z-upper-half-plane .sl2z-selection { fill:var(--viz-series-1); fill-opacity:.19; stroke:var(--viz-series-1); stroke-width:2; }
+  #sl2z-upper-half-plane .sl2z-vertex { fill:var(--viz-series-1); fill-opacity:.6; }
+  #sl2z-upper-half-plane .sl2z-tick { stroke:var(--foreground); stroke-opacity:.55; stroke-width:.8; }
+  #sl2z-upper-half-plane .sl2z-point { fill:var(--viz-series-1); stroke:var(--background); stroke-width:1.6; }
+  #sl2z-upper-half-plane .sl2z-grid { stroke:var(--border); stroke-width:.65; stroke-opacity:.45; }
+</style>
+
+
+<p class="math-note">ℱ={z∈ℍ : |Re z|≤½，|z|≥1}；S(z)=−1/z，T(z)=z+1。金色轮廓标出 ℱ。展开深度采用最短生成元字长。</p>
+<details class="help"><summary>键盘与数学</summary>
+<p>S / T / Shift+T：施加 S / T / T⁻¹；← / →：逐块选择；[ / ]：调整深度；＋ / −：缩放；F：聚焦；0：复位；空格：自动展开；C / L / G：填充／描线／柔光。</p>
+<p>每块区域是 gℱ，g=[a b;c d] 满足 ad−bc=1。g 与 −g 的作用相同，因此区域按 PSL₂(ℤ) 去重。画面展示有限展开，靠近实轴的结构继续无限细分。</p>
+</details><footer>Abstract Algebra · Möbius 变换与双曲几何</footer>
+<noscript>启用 JavaScript 即可互动探索。</noscript></main><script>
+
+(() => {
+  const root = document.getElementById("sl2z-upper-half-plane");
+  const host = root.querySelector(".sl2z-plot");
+  const slider = root.querySelector("#sl2z-depth");
+  const depthLabel = root.querySelector("#sl2z-depth-value");
+  const selectionLabel = root.querySelector("#sl2z-selected");
+  const countLabel = root.querySelector("#sl2z-count");
+  const NS = "http://www.w3.org/2000/svg";
+  const I = [1,0,0,1], S = [0,-1,1,0], T = [1,1,0,1], Ti = [1,-1,0,1];
+  const rhoL = [-.5,Math.sqrt(3)/2], rhoR = [.5,Math.sqrt(3)/2];
+  const same = (g,h) => g.every((n,i) => n === h[i]);
+  const key = g => g.join(",");
+  function canon(g) {
+    if (g[2] < 0 || (g[2] === 0 && g[3] < 0)) return g.map(n => n === 0 ? 0 : -n);
+    return g.map(n => n === 0 ? 0 : n);
+  }
+  function mul(g,h) {
+    const [a,b,c,d] = g, [e,f,k,l] = h;
+    return canon([a*e+b*k,a*f+b*l,c*e+d*k,c*f+d*l]);
+  }
+  const inv = g => canon([g[3],-g[1],-g[2],g[0]]);
+  function act(g,z) {
+    const [a,b,c,d] = g, [x,y] = z;
+    const den = (c*x+d)**2+(c*y)**2;
+    return [((a*x+b)*(c*x+d)+a*c*y*y)/den,y/den];
+  }
+  function reduce(z) {
+    let h = I.slice(), w = z.slice();
+    for (let j=0;j<90;j++) {
+      const n = Math.floor(w[0]+.5);
+      if (n) {w[0] -= n; h = mul([1,-n,0,1],h);}
+      if (w[0]**2+w[1]**2 >= 1-1e-11) return inv(h);
+      const d = w[0]**2+w[1]**2;
+      w = [-w[0]/d,w[1]/d]; h = mul(S,h);
+    }
+    return I.slice();
+  }
+  function circle(p,q) {
+    if (Math.abs(p[0]-q[0]) < 1e-12) return null;
+    const center = (p[0]**2+p[1]**2-q[0]**2-q[1]**2)/(2*(p[0]-q[0]));
+    const r = Math.hypot(p[0]-center,p[1]);
+    return {r:r,t1:Math.atan2(Math.max(0,p[1]),p[0]-center),
+      t2:Math.atan2(Math.max(0,q[1]),q[0]-center)};
+  }
+  function geometry(g) {
+    const p=act(g,rhoL), q=act(g,rhoR);
+    if (g[2]===0) return {p,q,cusp:null,xmin:Math.min(p[0],q[0]),xmax:Math.max(p[0],q[0]),ymax:Infinity};
+    const v=[g[0]/g[2],0];
+    let ymax=Math.max(p[1],q[1]);
+    for (const [a,b] of [[v,q],[q,p],[p,v]]) {
+      const cc=circle(a,b);
+      if (cc && Math.min(cc.t1,cc.t2)<=Math.PI/2 && Math.PI/2<=Math.max(cc.t1,cc.t2)) ymax=Math.max(ymax,cc.r);
+    }
+    return {p,q,cusp:v,xmin:Math.min(p[0],q[0],v[0]),xmax:Math.max(p[0],q[0],v[0]),ymax};
+  }
+  const tiles=[{g:I,depth:0}], lookup=new Map([[key(I),tiles[0]]]);
+  for (let i=0;i<tiles.length;i++) {
+    const tile=tiles[i];
+    if (tile.depth===18) continue;
+    for (const gen of [S,T,Ti]) {
+      const g=mul(tile.g,gen), k=key(g);
+      if (!lookup.has(k)) {
+        const next={g,depth:tile.depth+1};
+        tiles.push(next);lookup.set(k,next);
+      }
+    }
+  }
+  const camera={center:0,span:host.clientWidth<480?3.1:5.4,ymin:0};
+  let selected=I.slice(), width=0,height=0,scale=1,px=64,py=16,pw=1,ph=1,xmin=0,ymax=1;
+  let queued=false, depth=16;
+  const svg=document.createElementNS(NS,"svg");
+  svg.setAttribute("class","sl2z-diagram cursor-interaction");
+  svg.setAttribute("role","img");
+  svg.setAttribute("aria-label","SL(2,Z) 在上半平面上的有限深度基本域铺砌。可点选区域并施加 S、T 或 T 的逆。");
+  host.append(svg);
+  const f = n => Number(n.toFixed(5));
+  const X = x => px+(x-xmin)*scale;
+  const Y = y => py+ph-(y-camera.ymin)*scale;
+  const point = p => f(X(p[0]))+","+f(Y(p[1]));
+  function arc(p,q) {
+    const cc=circle(p,q);
+    if (!cc) return "L"+point(q);
+    const r=f(cc.r*scale);
+    return "A"+r+","+r+" 0 0 "+(cc.t1>cc.t2?1:0)+" "+point(q);
+  }
+  function path(geo) {
+    const p=geo.p,q=geo.q,v=geo.cusp;
+    if (!v) {
+      const top=ymax+camera.span;
+      return "M"+point(p)+"L"+point([p[0],top])+"L"+point([q[0],top])+"L"+point(q)+arc(q,p)+"Z";
+    }
+    return "M"+point(v)+arc(v,q)+arc(q,p)+arc(p,v)+"Z";
+  }
+  function visible(geo) {
+    return geo.xmax>=xmin && geo.xmin<=xmin+camera.span && geo.ymax>=camera.ymin &&
+      (!geo.cusp || (geo.xmax-geo.xmin)*scale>.32 && geo.ymax*scale>.32);
+  }
+  function short(g) {
+    if (same(g,I)) return "ℱ";
+    if (same(g,S)) return "Sℱ";
+    if (g[2]===0) {
+      if (g[1]===1) return "Tℱ";
+      if (g[1]===-1) return "T⁻¹ℱ";
+      return "T^"+g[1]+"ℱ";
+    }
+    return "gℱ";
+  }
+  function details() {
+    const [a,b,c,d]=selected;
+    const cusp=c===0?"∞":(c===1?String(a):a+"/"+c);
+    const tile=lookup.get(key(selected));
+    selectionLabel.textContent=short(selected)+" · g = ["+a+"  "+b+"; "+c+"  "+d+"] · 尖点 "+cusp+
+      (tile?" · 字长 "+tile.depth:"");
+    const moved=!same(selected,I);
+    root.querySelector(".sl2z-swatch.selected").parentElement.hidden=!moved;
+    syncExtraControls();
+  }
+  function draw() {
+    width=Math.max(280,host.clientWidth);
+    height=width<480?250:Math.min(420,width*.47+16);
+    pw=width-80;ph=height-64;
+    scale=pw/camera.span;xmin=camera.center-camera.span/2;ymax=camera.ymin+ph/scale;
+    svg.setAttribute("viewBox","0 0 "+width+" "+height);
+    svg.setAttribute("width",width);svg.setAttribute("height",height);
+    let shapes="",lines="",stars="",labels="",ticks="";
+    gradientDefinitions=[];
+    const seenVertices=new Set();
+    let count=0,total=0;
+    for (const tile of tiles) {
+      if (tile.depth>depth) break;
+      total++;
+      const geo=tile.geo||(tile.geo=geometry(tile.g));
+      if (!visible(geo)) continue;
+      const d=path(geo);
+      shapes+=paintTile(tile,geo,d);
+      lines+='<path d="'+d+'" stroke="'+colourTable[tile.id].edge+'"/>';
+      count++;
+      for (const p of [geo.p,geo.q]) {
+        if (p[1]<Math.max(.018,camera.ymin) || p[1]>ymax || p[0]<xmin || p[0]>xmin+camera.span) continue;
+        const k=p.map(x=>x.toFixed(7)).join(",");
+        if (seenVertices.has(k)) continue;
+        seenVertices.add(k);
+        const r=p[1]*scale>20?1.8:1;
+        stars+='<circle class="sl2z-vertex" cx="'+f(X(p[0]))+'" cy="'+f(Y(p[1]))+'" r="'+r+'"/>';
+      }
+    }
+    const standard=path(geometry(I));
+    const selGeo=geometry(selected), selectedPath=path(selGeo);
+    const top=Math.max(1.3, camera.ymin+.7*(ymax-camera.ymin));
+    for (let n=Math.ceil(xmin);n<=Math.floor(xmin+camera.span);n++) {
+      if (X(n)<px+20 || X(n)>px+pw-20 || top<1.1 || Math.abs(n)>depth) continue;
+      const lab=n===0?"ℱ":n===1?"Tℱ":n===-1?"T⁻¹ℱ":"T^"+n+"ℱ";
+      labels+='<text x="'+f(X(n))+'" y="'+f(Y(top))+'" text-anchor="middle">'+lab+'</text>';
+    }
+    const sx=act(selected,[0,1.7]);
+    if (!same(selected,I) && X(sx[0])>px+8 && X(sx[0])<px+pw-8 && Y(sx[1])>py+8 && Y(sx[1])<py+ph-8) {
+      labels+='<circle class="sl2z-point" cx="'+f(X(sx[0]))+'" cy="'+f(Y(sx[1]))+'" r="4"/>';
+      if (!same(selected,I) && selGeo.ymax*scale>40) labels+='<text x="'+f(X(sx[0])+9)+'" y="'+f(Y(sx[1])-9)+'">'+short(selected)+'</text>';
+    }
+    if (camera.ymin<1 && ymax>1 && xmin<0 && xmin+camera.span>0) {
+      labels+='<circle cx="'+f(X(0))+'" cy="'+f(Y(1))+'" r="2.2" fill="var(--viz-series-2)"/>';
+      labels+='<text x="'+f(X(0)+7)+'" y="'+f(Y(1)-7)+'">i</text>';
+    }
+    let step=camera.span>8?2:camera.span>3.5?1:camera.span>1.5?.5:camera.span>.6?.2:.1;
+    if (width<480) step=Math.max(step,camera.span>2.5?1:.5);
+    for(let x=Math.ceil(xmin/step)*step;x<xmin+camera.span;x+=step) {
+      const xx=X(x);
+      if(xx<px+8||xx>px+pw-8)continue;
+      ticks+='<path class="sl2z-tick" d="M'+f(xx)+','+f(py+ph)+'v4"/><text x="'+f(xx)+'" y="'+f(py+ph+19)+'" text-anchor="middle">'+f(x)+'</text>';
+    }
+    const yrange=ymax-camera.ymin,ys=yrange>3?1:yrange>1.2?.5:yrange>.5?.2:yrange>.2?.1:.05;
+    for(let y=Math.ceil(camera.ymin/ys)*ys;y<ymax;y+=ys) {
+      if (Y(y)<py+14) continue;
+      ticks+='<path class="sl2z-tick" d="M'+px+','+f(Y(y))+'h-4"/><text x="'+(px-10)+'" y="'+f(Y(y)+4)+'" text-anchor="end">'+f(y)+'</text>';
+    }
+    svg.innerHTML='<title>模群基本域在上半平面中的展开</title><desc>每个区域是一个整数行列式为一的矩阵作用于标准基本域的像。深度表示 S、T、T 的逆中的最短字长。</desc>'+
+      '<defs><clipPath id="sl2z-clip"><rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'"/></clipPath>'+gradientDefinitions.join("")+'</defs>'+
+      '<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="var(--background)" fill-opacity=".18"/>'+
+      '<g clip-path="url(#sl2z-clip)" pointer-events="none"><g class="sl2z-fills">'+shapes+'</g>'+(appearance.glow&&appearance.lines?'<g fill="none" stroke-width="3" stroke-opacity=".065">'+lines+'</g>':'')+'<g class="sl2z-structure">'+(appearance.lines?lines:'')+'</g>'+
+      '<path class="sl2z-standard" d="'+standard+'"/>'+
+      (!same(selected,I)?'<path class="sl2z-selection" d="'+selectedPath+'"/>':'')+
+      stars+labels+'</g><rect class="sl2z-frame" data-chart-frame x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'"/>'+
+      ticks+'<text class="axis-title" data-axis="x" x="'+f(px+pw)+'" y="'+f(height-3)+'" text-anchor="end">Re z</text>'+
+      '<text class="axis-title" data-axis="y" x="5" y="12">Im z</text>';
+    countLabel.textContent=total.toLocaleString()+" 个区域 · 可见 "+count.toLocaleString();
+    depthLabel.textContent=depth;
+    details();
+    root.dataset.ready="true";
+    root.dataset.visible=String(count);
+    root.dataset.matrix=key(selected);
+    root.dataset.span=String(camera.span);
+  }
+  function schedule() {
+    if (queued) return;
+    queued=true;requestAnimationFrame(()=>{queued=false;draw();});
+  }
+  function zoom(factor,anchor) {
+    const k=Math.min(20,Math.max(.16,camera.span*factor))/camera.span;
+    camera.center=anchor[0]+(camera.center-anchor[0])*k;
+    camera.ymin=Math.max(0,anchor[1]+(camera.ymin-anchor[1])*k);
+    camera.span*=k;schedule();
+  }
+  slider.addEventListener("input",()=>{stopPlay();setDepth(Number(slider.value));});
+  root.querySelectorAll("[data-generator]").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const gen=button.dataset.generator==="S"?S:button.dataset.generator==="T"?T:Ti;
+      rememberSelection();selected=mul(gen,selected);const known=lookup.get(key(selected));if(known&&known.depth>depth){depth=known.depth;slider.value=depth;}
+      const z=act(selected,[0,1.7]);
+      if(z[0]<xmin+.1*camera.span||z[0]>xmin+.9*camera.span)camera.center=z[0];
+      if(z[1]>ymax)camera.ymin=Math.max(0,z[1]-.5*(ymax-camera.ymin));
+      schedule();
+    });
+  });
+  root.querySelector("#sl2z-in").addEventListener("click",()=>zoom(.62,act(selected,[0,1.7])));
+  root.querySelector("#sl2z-out").addEventListener("click",()=>zoom(1.6,[camera.center,camera.ymin+.45*(ymax-camera.ymin)]));
+  const location = event => {
+    const r=svg.getBoundingClientRect();
+    return [(event.clientX-r.left)*width/r.width,(event.clientY-r.top)*height/r.height];
+  };
+  const fromPixels = p => [xmin+(p[0]-px)/scale,camera.ymin+(py+ph-p[1])/scale];
+  const pointers=new Map();let gesture=null,moved=false,start=null;
+  svg.addEventListener("pointerdown",event=>{
+    const p=location(event);
+    if(p[0]<px||p[0]>px+pw||p[1]<py||p[1]>py+ph)return;
+    svg.setPointerCapture(event.pointerId);pointers.set(event.pointerId,p);
+    moved=false;
+    if(pointers.size===1)start={p:p.slice(),center:camera.center,ymin:camera.ymin,scale};
+    if(pointers.size===2){
+      const [a,b]=Array.from(pointers.values()),mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      gesture={distance:Math.hypot(a[0]-b[0],a[1]-b[1]),span:camera.span,anchor:fromPixels(mid)};
+      moved=true;
+    }
+  });
+  svg.addEventListener("pointermove",event=>{
+    if(!pointers.has(event.pointerId))return;
+    const p=location(event);pointers.set(event.pointerId,p);
+    if(pointers.size===2&&gesture){
+      const [a,b]=Array.from(pointers.values()),mid=[(a[0]+b[0])/2,(a[1]+b[1])/2];
+      const newSpan=Math.max(.16,Math.min(20,gesture.span*gesture.distance/Math.max(1,Math.hypot(a[0]-b[0],a[1]-b[1]))));
+      const ss=pw/newSpan;
+      camera.span=newSpan;
+      camera.center=gesture.anchor[0]-(mid[0]-px-pw/2)/ss;
+      camera.ymin=Math.max(0,gesture.anchor[1]-(py+ph-mid[1])/ss);
+      moved=true;schedule();
+    }else if(start){
+      const dx=p[0]-start.p[0],dy=p[1]-start.p[1];
+      if(Math.hypot(dx,dy)>5)moved=true;
+      if(moved){camera.center=start.center-dx/start.scale;camera.ymin=Math.max(0,start.ymin+dy/start.scale);schedule();}
+    }
+  });
+  svg.addEventListener("pointerup",event=>{
+    if(!pointers.has(event.pointerId))return;
+    const p=location(event);
+    if(!moved&&pointers.size===1){
+      const z=fromPixels(p);
+      if(z[1]>1e-8){rememberSelection();selected=reduce(z);const hit=lookup.get(key(selected));if(hit&&hit.depth>depth){depth=hit.depth;slider.value=depth;}schedule();}
+    }
+    pointers.delete(event.pointerId);gesture=null;start=null;
+    moved=true;
+  });
+  svg.addEventListener("pointercancel",event=>{pointers.delete(event.pointerId);gesture=null;start=null;});
+  svg.addEventListener("wheel",event=>{
+    const p=location(event);
+    if(p[0]<px||p[0]>px+pw||p[1]<py||p[1]>py+ph)return;
+    event.preventDefault();zoom(event.deltaY>0?1.13:.885,fromPixels(p));
+  },{passive:false});
+  /* This source is inserted inside the explorer closure by build_sl2z.py. */
+const appearance={palette:"rainbow",region:0.55,depth:0.65,fills:true,lines:true,glow:true};
+const indexByKey=new Map();
+tiles.forEach((tile,i)=>{tile.id=i;indexByKey.set(key(tile.g),i);});
+let gradientDefinitions=[],colourTable=[],colourStats={},playTimer=null,colourTimer=null;
+const selectionHistory=[];
+const extra=id=>root.querySelector("#sl2z-"+id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const pack=c=>(c[0]<<16)|(c[1]<<8)|c[2];
+const hex=c=>"#"+c.map(v=>Math.round(clamp(v,0,255)).toString(16).padStart(2,"0")).join("");
+const mix=(a,b,t)=>a.map((v,i)=>v*(1-t)+b[i]*t);
+function hashText(text) {
+  let h=2166136261;
+  for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);
+  return h>>>0;
+}
+function hsv(h,s,v) {
+  h=((h%1)+1)%1;
+  const j=Math.floor(h*6),f=h*6-j,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s);
+  return [[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][j%6].map(x=>Math.round(x*255));
+}
+function rawColour(tile) {
+  const [x,y]=act(tile.g,[0.137,1.63]),den=x*x+(y+1)*(y+1);
+  const u=(x*x+y*y-1)/den,v=-2*x/den;
+  const r=Math.min(.999999999999,Math.hypot(u,v));
+  const radius=1-Math.exp(-2*Math.atanh(r)/3),angle=Math.atan2(v,u);
+  const phase=hashText(key(tile.g))/4294967296,phase2=hashText("s:"+key(tile.g))/4294967296;
+  const d=tile.depth/18,A=appearance.depth,B=appearance.region;
+  let h;
+  if(appearance.palette==="cyan")h=.50+.09*A*d+.025*Math.sin(angle)+.015*Math.cos(angle)+.09*B*(phase-.5);
+  else if(appearance.palette==="orchid")h=.71+.14*A*d+.04*Math.sin(angle)+.025*Math.cos(angle)+.12*B*(phase-.5);
+  else h=.53+.62*A*d+.10*Math.sin(angle)+.055*Math.cos(angle)+.12*radius+.26*B*(phase-.5);
+  const s=clamp(.40+.14*radius+.16*B*(phase2-.5),.22,.72);
+  const value=clamp(.85-.16*A*d-.11*radius+.13*B*(phase-.5),.48,.91);
+  return hsv(h,s,value);
+}
+const offsets=[];
+for(let a=-4;a<=4;a++)for(let b=-4;b<=4;b++)for(let c=-4;c<=4;c++)offsets.push([a,b,c]);
+offsets.sort((a,b)=>a.reduce((s,v)=>s+v*v,0)-b.reduce((s,v)=>s+v*v,0)||a[0]-b[0]||a[1]-b[1]||a[2]-b[2]);
+function uniqueColour(rgb,used) {
+  for(const delta of offsets) {
+    const c=rgb.map((v,i)=>v+delta[i]);
+    if(c.some(v=>v<0||v>255))continue;
+    const k=pack(c);
+    if(!used.has(k)){used.add(k);return c;}
+  }
+  let k=pack(rgb);
+  while(used.has(k))k=(k+1)&0xffffff;
+  used.add(k);return [k>>>16,(k>>>8)&255,k&255];
+}
+const toLinear=v=>v/255<=.04045?v/3294.6:((v/255+.055)/1.055)**2.4;
+const toSrgb=v=>255*(v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055);
+function rebuildColours() {
+  const used=new Set();let collisions=0,maxCorrection=0;
+  colourTable=tiles.map(tile=>{
+    const raw=rawColour(tile),rgb=uniqueColour(raw,used);
+    if(raw.some((v,i)=>v!==rgb[i]))collisions++;
+    maxCorrection=Math.max(maxCorrection,...raw.map((v,i)=>Math.abs(v-rgb[i])));
+    return {rgb,fill:hex(rgb),core:hex(mix(rgb,[234,245,252],.12))};
+  });
+  tiles.forEach(tile=>{
+    const c=colourTable[tile.id],neighbours=[c.rgb];
+    for(const gen of [S,T,Ti]){
+      const id=indexByKey.get(key(mul(tile.g,gen)));
+      if(id!==undefined)neighbours.push(colourTable[id].rgb);
+    }
+    const mean=[0,1,2].map(i=>toSrgb(neighbours.reduce((sum,rgb)=>sum+toLinear(rgb[i]),0)/neighbours.length));
+    c.edge=hex(mix(mean,[220,239,250],.22));
+    c.rim=hex(mix(mix(c.rgb,mean,.32),[7,13,24],.28));
+  });
+  colourStats={unique:used.size,collisionsResolved:collisions,maxChannelCorrection:maxCorrection};
+}
+function paintTile(tile,geo,d) {
+  if(!appearance.fills)return '<path d="'+d+'" fill="none"/>';
+  const c=colourTable[tile.id];
+  const size=Math.min((geo.xmax-geo.xmin)*scale,Number.isFinite(geo.ymax)?geo.ymax*scale:ph);
+  let fill=c.fill;
+  if(size>9) {
+    const p=act(tile.g,[.137,1.63]),radius=(geo.cusp?Math.max(geo.xmax-geo.xmin,geo.ymax)*.9:1.9)*scale;
+    const id="cell-colour-"+tile.id;
+    gradientDefinitions.push('<radialGradient id="'+id+'" gradientUnits="userSpaceOnUse" cx="'+f(X(p[0]))+'" cy="'+f(Y(p[1]))+'" r="'+f(radius)+'"><stop offset="0" stop-color="'+c.core+'"/><stop offset=".48" stop-color="'+c.fill+'"/><stop offset="1" stop-color="'+c.rim+'"/></radialGradient>');
+    fill="url(#"+id+")";
+  }
+  return '<path data-tile="'+tile.id+'" d="'+d+'" fill="'+fill+'" fill-opacity=".72"/>';
+}
+function rememberSelection() {
+  selectionHistory.push({g:selected.slice(),depth,camera:{...camera}});
+  if(selectionHistory.length>80)selectionHistory.shift();
+}
+function setDepth(value) {
+  depth=clamp(Math.round(value),0,18);slider.value=depth;
+  const tile=lookup.get(key(selected));
+  if(tile&&tile.depth>depth)selected=I.slice();
+  schedule();
+}
+function selectIndex(id) {
+  const available=tiles.filter(t=>t.depth<=depth).length;
+  id=clamp(Math.round(id),0,available-1);
+  rememberSelection();selected=tiles[id].g.slice();
+  const p=act(selected,[.137,1.63]);
+  if(p[0]<xmin+.08*camera.span||p[0]>xmin+.92*camera.span)camera.center=p[0];
+  if(p[1]<camera.ymin||p[1]>ymax)camera.ymin=Math.max(0,p[1]-.45*(ymax-camera.ymin));
+  schedule();
+}
+function nextRegion(delta) {
+  selectIndex((indexByKey.get(key(selected))||0)+delta);
+}
+function syncExtraControls() {
+  const id=indexByKey.get(key(selected)),count=tiles.filter(t=>t.depth<=depth).length;
+  extra("region").max=count-1;
+  extra("region").value=id===undefined?0:Math.min(count-1,id);
+  extra("region-count").textContent=id===undefined?"独立选区":(id+1).toLocaleString()+" / "+count.toLocaleString();
+  extra("previous").disabled=id===0;
+  extra("next").disabled=id===count-1;
+  extra("less").disabled=depth===0;extra("more").disabled=depth===18;
+  extra("undo").disabled=selectionHistory.length===0;
+  root.dataset.depth=String(depth);root.dataset.palette=appearance.palette;
+  root.dataset.uniqueColours=String(colourStats.unique);
+}
+function stopPlay() {
+  if(playTimer!==null)clearInterval(playTimer);
+  playTimer=null;extra("play").textContent="自动展开";extra("play").setAttribute("aria-pressed","false");
+}
+function play() {
+  if(playTimer!==null){stopPlay();return;}
+  if(depth===18)setDepth(0);
+  extra("play").textContent="暂停展开";extra("play").setAttribute("aria-pressed","true");
+  playTimer=setInterval(()=>{setDepth(depth+1);if(depth===18)stopPlay();},900);
+}
+function resetView() {
+  rememberSelection();stopPlay();selected=I.slice();
+  camera.center=0;camera.ymin=0;camera.span=host.clientWidth<480?3.1:5.4;
+  setDepth(16);
+}
+function focusRegion() {
+  const geo=geometry(selected);
+  camera.center=(geo.xmin+geo.xmax)/2;camera.ymin=0;
+  camera.span=geo.cusp?clamp(Math.max((geo.xmax-geo.xmin)*2.3,geo.ymax*pw/ph*1.4),.025,15):2.6;
+  schedule();
+}
+function snapshotSVG() {
+  const style='<style>text{font-family:system-ui,sans-serif;font-size:12px;fill:#dceaf4}.sl2z-fills{stroke:none}.sl2z-structure{fill:none;stroke-width:.65;stroke-opacity:.38}.sl2z-frame{fill:none;stroke:#3a536b;stroke-width:1}.sl2z-standard{fill:none;stroke:#e8c67b;stroke-width:1.5}.sl2z-selection{fill:#7ec8e5;fill-opacity:.12;stroke:#e5f4ff;stroke-width:2}.sl2z-vertex{fill:#8dc9df;fill-opacity:.65}.sl2z-tick{stroke:#8397ab;stroke-width:.8}.sl2z-point{fill:#e4f3fc;stroke:#0b1525;stroke-width:1.5}</style>';
+  const inner=svg.innerHTML.replace(/var\(--background\)/g,"#0b1525").replace(/var\(--viz-series-2\)/g,"#e8c67b");
+  return '<svg xmlns="'+NS+'" width="'+width+'" height="'+height+'" viewBox="0 0 '+width+' '+height+'"><rect width="100%" height="100%" fill="#0b1525"/>'+style+inner+"</svg>";
+}
+function download(blob,name) {
+  const url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download=name;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
+function exportSVG() {download(new Blob([snapshotSVG()],{type:"image/svg+xml;charset=utf-8"}),"SL2Z_H_N"+depth+"_"+appearance.palette+".svg");}
+function exportPNG() {
+  const url=URL.createObjectURL(new Blob([snapshotSVG()],{type:"image/svg+xml;charset=utf-8"})),img=new Image();
+  img.onload=()=>{
+    const canvas=document.createElement("canvas");canvas.width=Math.round(width*3);canvas.height=Math.round(height*3);
+    canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);URL.revokeObjectURL(url);
+    canvas.toBlob(blob=>{if(blob)download(blob,"SL2Z_H_N"+depth+"_"+appearance.palette+".png");},"image/png");
+  };
+  img.onerror=()=>URL.revokeObjectURL(url);img.src=url;
+}
+extra("previous").addEventListener("click",()=>nextRegion(-1));
+extra("next").addEventListener("click",()=>nextRegion(1));
+extra("region").addEventListener("input",e=>selectIndex(Number(e.target.value)));
+extra("less").addEventListener("click",()=>{stopPlay();setDepth(depth-1);});
+extra("more").addEventListener("click",()=>{stopPlay();setDepth(depth+1);});
+extra("play").addEventListener("click",play);
+extra("reset").addEventListener("click",resetView);
+extra("focus").addEventListener("click",focusRegion);
+extra("undo").addEventListener("click",()=>{
+  const old=selectionHistory.pop();if(!old)return;
+  selected=old.g;depth=old.depth;Object.assign(camera,old.camera);slider.value=depth;schedule();
+});
+extra("export-svg").addEventListener("click",exportSVG);
+extra("export-png").addEventListener("click",exportPNG);
+extra("palette").addEventListener("change",e=>{appearance.palette=e.target.value;rebuildColours();schedule();});
+for(const prop of ["region","depth"])extra(prop+"-mix").addEventListener("input",e=>{
+  appearance[prop]=Number(e.target.value)/100;
+  extra(prop==="depth"?"depth-mix-value":prop+"-value").textContent=e.target.value+"%";
+  clearTimeout(colourTimer);colourTimer=setTimeout(()=>{rebuildColours();schedule();},60);
+});
+for(const prop of ["fills","lines","glow"])extra(prop).addEventListener("click",()=>{
+  appearance[prop]=!appearance[prop];extra(prop).setAttribute("aria-pressed",String(appearance[prop]));schedule();
+});
+document.addEventListener("keydown",e=>{
+  if(e.target.closest("input,select,textarea,button,summary")||e.altKey||e.ctrlKey||e.metaKey)return;
+  const k=e.key.length===1?e.key.toLowerCase():e.key;
+  const actions={
+    s:()=>root.querySelector('[data-generator="S"]').click(),
+    t:()=>root.querySelector('[data-generator="'+(e.shiftKey?"Ti":"T")+'"]').click(),
+    ArrowLeft:()=>nextRegion(-1),ArrowRight:()=>nextRegion(1),
+    "[":()=>setDepth(depth-1),"]":()=>setDepth(depth+1),
+    "+":()=>extra("in").click(),"=":()=>extra("in").click(),"-":()=>extra("out").click(),
+    f:focusRegion,"0":resetView," ":play,
+    c:()=>extra("fills").click(),l:()=>extra("lines").click(),g:()=>extra("glow").click()
+  };
+  if(actions[k]){e.preventDefault();actions[k]();}
+});
+window.addEventListener("pagehide",()=>{stopPlay();clearTimeout(colourTimer);});
+window.Sl2zExplorer={
+  getState:()=>({selected:selected.slice(),depth,camera:{...camera},appearance:{...appearance},colourStats:{...colourStats},visible:Number(root.dataset.visible)}),
+  selectIndex,setDepth,rebuildColours,snapshotSVG,stopPlay,
+  colours:()=>colourTable.map(c=>c.fill),
+  math:{I,S,T,Ti,mul,inv,act,reduce,geometry},tiles
+};
+rebuildColours();
+
+  new ResizeObserver(()=>{if(host.clientWidth!==width)schedule();}).observe(host);
+  draw();
+})();
+</script></body></html>

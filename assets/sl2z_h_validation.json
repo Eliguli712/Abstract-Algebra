@@ -1,0 +1,33 @@
+{
+  "max_depth": 18,
+  "tiles": 35416,
+  "depth_counts": {
+    "0": 1,
+    "1": 3,
+    "2": 6,
+    "3": 10,
+    "4": 16,
+    "5": 26,
+    "6": 42,
+    "7": 68,
+    "8": 110,
+    "9": 178,
+    "10": 288,
+    "11": 466,
+    "12": 754,
+    "13": 1220,
+    "14": 1974,
+    "15": 3194,
+    "16": 5168,
+    "17": 8362,
+    "18": 13530
+  },
+  "all_determinants_one": true,
+  "all_inverse_reductions_passed": true,
+  "maximum_inverse_error": 1.782499220223583e-11,
+  "random_reduction_checks": 1000,
+  "random_points_in_finite_display": 999,
+  "note": "Finite generator depth need not cover all points in the viewport.",
+  "hyperbolic_area_of_F": 1.0471975511965979,
+  "drawn_tiles": 6870
+}

@@ -1,0 +1,38 @@
+<div class="extra-controls">
+  <div class="control-block">
+    <label for="sl2z-palette">色彩预设</label>
+    <select class="form-select" id="sl2z-palette">
+      <option value="rainbow">自适应彩虹</option>
+      <option value="cyan">青蓝深海</option>
+      <option value="orchid">紫兰暮光</option>
+    </select>
+  </div>
+  <div class="control-block">
+    <label for="sl2z-region-mix">区域色差 <span id="sl2z-region-value">55%</span></label>
+    <input class="form-range" id="sl2z-region-mix" type="range" min="0" max="100" value="55">
+  </div>
+  <div class="control-block">
+    <label for="sl2z-depth-mix">深度色移 <span id="sl2z-depth-value">65%</span></label>
+    <input class="form-range" id="sl2z-depth-mix" type="range" min="0" max="100" value="65">
+  </div>
+</div>
+<div class="viz-controls step-controls">
+  <button type="button" class="btn" id="sl2z-previous">上一块</button>
+  <label class="region-control">逐区 <span id="sl2z-region-count"></span>
+    <input class="form-range" id="sl2z-region" type="range" min="0" max="13523" value="0">
+  </label>
+  <button type="button" class="btn" id="sl2z-next">下一块</button>
+  <button type="button" class="btn" id="sl2z-focus">聚焦当前</button>
+  <button type="button" class="btn" id="sl2z-undo" disabled>撤回选区</button>
+</div>
+<div class="viz-controls">
+  <button type="button" class="btn" id="sl2z-less">少一层 [</button>
+  <button type="button" class="btn" id="sl2z-more">多一层 ]</button>
+  <button type="button" class="btn" id="sl2z-play" aria-pressed="false">自动展开</button>
+  <button type="button" class="btn" id="sl2z-reset">复位</button>
+  <button type="button" class="btn" id="sl2z-fills" aria-pressed="true">填充</button>
+  <button type="button" class="btn" id="sl2z-lines" aria-pressed="true">描线</button>
+  <button type="button" class="btn" id="sl2z-glow" aria-pressed="true">柔光</button>
+  <button type="button" class="btn" id="sl2z-export-svg">导出 SVG</button>
+  <button type="button" class="btn" id="sl2z-export-png">导出 PNG</button>
+</div>
