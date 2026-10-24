@@ -6,9 +6,9 @@
 
 **[进入完整演示目录](https://eliguli712.github.io/Abstract-Algebra/)**
 
-页面顶部可选择 **中文 / English / Deutsch**，首页与三个互动实验均支持即时切换，并保留当前参数和语言偏好。
+页面顶部按 **English / Deutsch / 中文** 排列语言选项，首次访问默认英文。首页与三个互动实验均支持即时切换，并保留当前参数和语言偏好。
 
-[中文](https://eliguli712.github.io/Abstract-Algebra/?lang=zh) · [English](https://eliguli712.github.io/Abstract-Algebra/?lang=en) · [Deutsch](https://eliguli712.github.io/Abstract-Algebra/?lang=de) · [语言设置说明](docs/LANGUAGES.md)
+[English](https://eliguli712.github.io/Abstract-Algebra/?lang=en) · [Deutsch](https://eliguli712.github.io/Abstract-Algebra/?lang=de) · [中文](https://eliguli712.github.io/Abstract-Algebra/?lang=zh) · [语言设置说明](docs/LANGUAGES.md)
 
 | 实验 | 公开运行 | 独立 HTML |
 | --- | --- | --- |

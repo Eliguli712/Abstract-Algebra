@@ -4,11 +4,11 @@
   const entries = __ALGEBRA_LOCALES__;
   const homePath = __ALGEBRA_HOME__;
   const key = 'abstract-algebra-language';
-  const valid = value => ['zh', 'en', 'de'].includes(value);
+  const valid = value => ['en', 'de', 'zh'].includes(value);
   let stored;
   try { stored = localStorage.getItem(key); } catch (_) { /* Offline storage may be disabled. */ }
   const requested = new URL(location.href).searchParams.get('lang');
-  let language = valid(requested) ? requested : valid(stored) ? stored : 'zh';
+  let language = valid(requested) ? requested : valid(stored) ? stored : 'en';
   const normalize = value => value.trim().replace(/\s+/g, ' ');
   const dictionary = new Map(entries.map(row => [normalize(row[0]), row]));
   const originals = new WeakMap();
@@ -34,7 +34,7 @@
   }
   const toolbar = document.createElement('div');
   toolbar.id = 'algebra-language-bar';
-  toolbar.innerHTML = '<a id="algebra-language-home"></a><label for="algebra-language"><span id="algebra-language-label"></span><select id="algebra-language"><option value="zh" lang="zh-Hans">中文</option><option value="en" lang="en">English</option><option value="de" lang="de">Deutsch</option></select></label>';
+  toolbar.innerHTML = '<a id="algebra-language-home"></a><label for="algebra-language"><span id="algebra-language-label"></span><select id="algebra-language"><option value="en" lang="en">English</option><option value="de" lang="de">Deutsch</option><option value="zh" lang="zh-Hans">中文</option></select></label>';
   const style = document.createElement('style');
   style.textContent = '#algebra-language-bar{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;max-width:1280px;margin:14px auto 6px;padding:0 22px;font:14px/1.5 system-ui,sans-serif;color:inherit}#algebra-language-bar a{color:inherit;text-underline-offset:4px}#algebra-language-bar label{display:flex;gap:10px;align-items:center}#algebra-language-bar select{box-sizing:border-box;width:auto;min-width:116px;min-height:44px;font:16px/1.4 system-ui,sans-serif;padding:8px 12px;border:1px solid #7d869b;border-radius:7px;background:Canvas;color:CanvasText}#algebra-language-bar select:focus-visible{outline:2px solid #789dde;outline-offset:3px}html[lang=de] .row{flex-wrap:wrap}html[lang=de] .row .rng{min-width:110px}html[lang=de] .seg{flex-wrap:wrap}html[lang=de] .seg button{flex-basis:44%;min-height:36px}html[lang=de] nav .name{overflow-wrap:anywhere}';
   document.head.append(style);
