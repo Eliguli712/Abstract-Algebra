@@ -53,7 +53,10 @@ def build():
 '''+scripts[0]+'''</script></body></html>'''
     output=APP/"index.html"
     output.write_text(document,encoding="utf-8")
+    from build_languages import localize_file
+    localize_file(output)
     print(f"Built {output.relative_to(ROOT)}: {output.stat().st_size} bytes")
     return output
 
 if __name__=="__main__":build()
+

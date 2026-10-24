@@ -1,6 +1,6 @@
 # 圆链与嵌套阿波罗尼斯互动实验
 
-这两个独立 HTML 页面来自作者提供的版本，发布时保持原始文件内容。它们与仓库已有的 SL₂(ℤ) 可视化共同列在[演示目录](../index.html)。
+这两个独立 HTML 页面来自作者提供的版本。当前页面在原有绘图与互动逻辑上增加了中文、英文和德文界面；语言设置详见[说明](LANGUAGES.md)。它们与仓库已有的 SL₂(ℤ) 可视化共同列在[演示目录](../index.html)。
 
 ## Steiner 与 Pappus 圆链 · v5
 
@@ -43,9 +43,12 @@ python3 -m http.server 8000
 
 ## 来源与完整性
 
+下表记录 2026-10-23 导入时原始文件的校验值；原始内容保留在 Git 历史中。当前页面已内嵌三语界面，文件校验值随此更新改变。
+
 | 原始文件名 | 仓库路径 | SHA-256 |
 | --- | --- | --- |
 | Steiner pappus v5.html | `circle-chains/steiner-pappus-v5.html` | `acfadfcf6a81f540dd0b9f39733b0affdd23a82e879d53ba8026dd98d766174f` |
 | Nested apollonian v2.html | `circle-chains/nested-apollonian-v2.html` | `e2a9983513c35e11a182e02c40a972733a7458a75b75dac8ed9db08cc892017f` |
 
 预览图由这两个页面的默认绘图代码生成。发布前完成脚本解析、初始 Canvas 绘制、暂停与反向、参数同步、整数种子、着色切换和四种 PNG 导出路径的本地检查。
+

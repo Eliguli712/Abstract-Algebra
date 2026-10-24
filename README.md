@@ -6,13 +6,17 @@
 
 **[进入完整演示目录](https://eliguli712.github.io/Abstract-Algebra/)**
 
+页面顶部可选择 **中文 / English / Deutsch**，首页与三个互动实验均支持即时切换，并保留当前参数和语言偏好。
+
+[中文](https://eliguli712.github.io/Abstract-Algebra/?lang=zh) · [English](https://eliguli712.github.io/Abstract-Algebra/?lang=en) · [Deutsch](https://eliguli712.github.io/Abstract-Algebra/?lang=de) · [语言设置说明](docs/LANGUAGES.md)
+
 | 实验 | 公开运行 | 独立 HTML |
 | --- | --- | --- |
 | Steiner 与 Pappus 圆链 · v5 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/circle-chains/steiner-pappus-v5.html) | [下载／查看源码](circle-chains/steiner-pappus-v5.html) |
 | 嵌套阿波罗尼斯垫片 · v2 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/circle-chains/nested-apollonian-v2.html) | [下载／查看源码](circle-chains/nested-apollonian-v2.html) |
 | SL₂(ℤ) 上半平面展开 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/sl2z/) | [下载／查看源码](sl2z/index.html) |
 
-圆链页面支持独立调参、逐层旋转、暂停、反向与 PNG 导出。两个导入的 HTML 保持作者提供的原始版本；[操作说明与来源校验](docs/CIRCLE_CHAINS.md)列出各项控件和 SHA-256。所有独立互动页面可下载后离线打开。
+圆链页面支持独立调参、逐层旋转、暂停、反向与 PNG 导出。两个导入的 HTML 在原有绘图与互动逻辑上增加了三语界面；[操作说明与来源校验](docs/CIRCLE_CHAINS.md)列出各项控件和导入时的 SHA-256。所有独立互动页面可下载后离线打开。
 
 ![庞加莱圆盘与上半平面的自适应彩虹着色](assets/poincare_adaptive_rainbow.png)
 
@@ -84,5 +88,6 @@ python poincare_face_shading_2.py --help
 | [assets/poincare_adaptive_rainbow.png](assets/poincare_adaptive_rainbow.png) | 已提交的高分辨率示例图 |
 
 分隔深度是相对于基点、由当前绘制圆弧计算的计数。分区和微小区域填充采用有限栅格近似；完整定义及使用边界见[方法说明](docs/POINCARE_SHADING.md)。
+
 
 
