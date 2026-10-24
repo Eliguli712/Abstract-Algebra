@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌套阿波罗尼斯垫片 · Nested Apollonian Gasket</title>
+<style>
+  :root{
+    --bg:#0b0d12; --bg2:#11141b; --panel:#161a23; --line:#252b38;
+    --ink:#e9edf5; --mut:#7d869b; --accent:#6ea8ff; --accent2:#9b8cff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:
+    radial-gradient(1200px 600px at 50% -10%, #1a2030 0%, var(--bg) 60%);
+    color:var(--ink);font-family:'Inter',system-ui,-apple-system,Georgia,serif;}
+  .wrap{max-width:1280px;margin:0 auto;padding:18px 20px 40px;}
+  header{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
+  h1{margin:0;font-size:21px;font-weight:700;letter-spacing:.2px;
+     background:linear-gradient(90deg,#cfe0ff,#b6a8ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .sub{font-size:12.5px;color:var(--mut);}
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start;}
+  @media(max-width:880px){.layout{grid-template-columns:1fr;}}
+  .stage{position:relative;background:var(--bg2);border:1px solid var(--line);
+     border-radius:16px;padding:12px;box-shadow:0 10px 40px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.03);}
+  canvas{width:100%;height:auto;display:block;border-radius:10px;background:#06070a;}
+  .badge{position:absolute;top:20px;left:20px;font-size:11px;color:var(--mut);
+     background:rgba(0,0,0,.45);padding:4px 9px;border-radius:20px;border:1px solid var(--line);backdrop-filter:blur(6px);}
+  .side{display:flex;flex-direction:column;gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 15px;}
+  .card h3{margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:.6px;color:var(--accent);text-transform:uppercase;}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;font-size:12.5px;}
+  .row label{color:#c2c9d6;flex:0 0 auto;}
+  .row .rng{flex:1 1 auto;display:flex;align-items:center;gap:8px;}
+  input[type=range]{flex:1;-webkit-appearance:none;height:4px;border-radius:3px;
+     background:linear-gradient(90deg,var(--accent),var(--accent2));outline:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;
+     background:#eef2fb;border:2px solid var(--accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.5);}
+  input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#eef2fb;border:2px solid var(--accent);cursor:pointer;}
+  .val{font-variant-numeric:tabular-nums;min-width:40px;text-align:right;color:#fff;font-weight:600;}
+  select{width:100%;font-family:inherit;font-size:12.5px;background:#0e1118;color:var(--ink);
+     border:1px solid var(--line);border-radius:8px;padding:7px 9px;cursor:pointer;}
+  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+  .seg button{flex:1;border:none;background:transparent;color:var(--mut);font-family:inherit;font-size:11.5px;
+     padding:7px 4px;cursor:pointer;border-right:1px solid var(--line);transition:.15s;}
+  .seg button:last-child{border-right:none;}
+  .seg button.active{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0b0d12;font-weight:700;}
+  .btns{display:flex;gap:8px;flex-wrap:wrap;}
+  .btns button{flex:1;font-family:inherit;font-size:12px;padding:8px 10px;border-radius:9px;cursor:pointer;
+     border:1px solid var(--line);background:#0e1118;color:var(--ink);transition:.15s;}
+  .btns button:hover{border-color:var(--accent);color:var(--accent);}
+  .btns button.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0b0d12;border:none;font-weight:700;}
+  .cbrow{display:flex;gap:14px;flex-wrap:wrap;}
+  .cb{display:flex;align-items:center;gap:7px;font-size:12px;color:#c2c9d6;cursor:pointer;}
+  .cb input{accent-color:var(--accent);}
+  .info{font-size:11px;color:var(--mut);line-height:1.6;padding-top:4px;border-top:1px solid var(--line);margin-top:6px;}
+  .info b{color:#aab4c8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>嵌套阿波罗尼斯垫片</h1>
+    <span class="sub">Nested Apollonian Gasket · 全盘填充 · 连续方差 · 深度色彩梯度 · 逐层自转</span>
+  </header>
+  <div class="layout">
+    <div class="stage">
+      <span class="badge" id="badge">—</span>
+      <canvas id="cv" width="1000" height="1000"></canvas>
+    </div>
+    <div class="side">
+      <div class="card">
+        <h3>种子几何（保持相切 · 布满圆盘）</h3>
+        <div class="row"><label>环数 n</label><span class="rng"><input id="ring" type="range" min="3" max="8" step="1" value="5"><span class="val" id="ringv">5</span></span></div>
+        <div class="row"><label>连续方差</label><span class="rng"><input id="var" type="range" min="0" max="1.0" step="0.01" value="0.0"><span class="val" id="varv">0.00</span></span></div>
+        <div class="row"><label>方差方向</label><span class="rng"><input id="vang" type="range" min="0" max="360" step="5" value="270"><span class="val" id="vangv">270</span></span></div>
+        <div class="info" id="seedInfo">—</div>
+      </div>
+      <div class="card">
+        <h3>递归 / 嵌套</h3>
+        <div class="row"><label>嵌套深度</label><span class="rng"><input id="nest" type="range" min="0" max="4" step="1" value="2"><span class="val" id="nestv">2</span></span></div>
+        <div class="row"><label>垫片代数</label><span class="rng"><input id="gen" type="range" min="2" max="6" step="1" value="5"><span class="val" id="genv">5</span></span></div>
+        <div class="row"><label>最小半径</label><span class="rng"><input id="rmin" type="range" min="0.006" max="0.04" step="0.002" value="0.014"><span class="val" id="rminv">0.014</span></span></div>
+      </div>
+      <div class="card">
+        <h3>旋转</h3>
+        <div class="row"><label>基速 ω</label><span class="rng"><input id="w" type="range" min="0" max="0.8" step="0.01" value="0.16"><span class="val" id="wv">0.16</span></span></div>
+        <div class="row"><label>内层加速 ×</label><span class="rng"><input id="acc" type="range" min="0.4" max="2.6" step="0.05" value="1.5"><span class="val" id="accv">1.50</span></span></div>
+        <div class="btns" style="margin-top:6px;">
+          <button id="play" class="primary">⏸ 暂停</button>
+          <button id="dir">↻ 方向</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>外观</h3>
+        <div class="row" style="margin-top:0;"><label>配色</label></div>
+        <select id="palette">
+          <option value="aurora">极光 Aurora</option>
+          <option value="ember">余烬 Ember</option>
+          <option value="abyss">深渊 Abyss</option>
+          <option value="viridis">Viridis</option>
+          <option value="sunset">日落 Sunset</option>
+          <option value="mono">石墨 Mono</option>
+        </select>
+        <div style="height:8px;"></div>
+        <div class="seg" id="gradMode">
+          <button data-v="both" class="active">深度+层级</button>
+          <button data-v="nest">嵌套深度</button>
+          <button data-v="gen">垫片层级</button>
+          <button data-v="mod">k mod m</button>
+        </div>
+        <div style="height:8px;"></div>
+        <div class="row" style="margin:4px 0;"><label>模数 m</label>
+          <select id="kmod" style="width:auto;min-width:70px;">
+            <option value="3">3</option><option value="4">4</option><option value="6">6</option>
+            <option value="8">8</option><option value="12">12</option><option value="24" selected>24</option>
+          </select>
+        </div>
+        <div style="height:10px;"></div>
+        <div class="cbrow">
+          <label class="cb"><input type="checkbox" id="alt" checked> 明暗交替</label>
+          <label class="cb"><input type="checkbox" id="intSeed"> 整数种子 (−1,2,2,3)</label>
+          <label class="cb"><input type="checkbox" id="showK"> 显示曲率整数</label>
+          <label class="cb"><input type="checkbox" id="outline"> 描边</label>
+          <label class="cb"><input type="checkbox" id="glow" checked> 辉光</label>
+        </div>
+        <div style="height:10px;"></div>
+        <div class="btns"><button id="export" class="primary">⬇ 导出 PNG</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const C=(re,im)=>({re,im});
+const cadd=(a,b)=>C(a.re+b.re,a.im+b.im);
+const csub=(a,b)=>C(a.re-b.re,a.im-b.im);
+const cmul=(a,b)=>C(a.re*b.re-a.im*b.im,a.re*b.im+a.im*b.re);
+const cdiv=(a,b)=>{const d=b.re*b.re+b.im*b.im;return C((a.re*b.re+a.im*b.im)/d,(a.im*b.re-a.re*b.im)/d);};
+const cscale=(a,s)=>C(a.re*s,a.im*s);
+const cabs=(a)=>Math.hypot(a.re,a.im);
+const cconj=(a)=>C(a.re,-a.im);
+const csqrt=(a)=>{const r=Math.hypot(a.re,a.im),re=Math.sqrt((r+a.re)/2);let im=Math.sqrt((r-a.re)/2);if(a.im<0)im=-im;return C(re,im);};
+const cexp=(t)=>C(Math.cos(t),Math.sin(t));
+const $=id=>document.getElementById(id);
+
+function dk(k1,k2,k3){const s=k1+k2+k3,t=2*Math.sqrt(Math.abs(k1*k2+k2*k3+k3*k1));return [s+t,s-t];}
+function dz(k1,k2,k3,k4,z1,z2,z3){
+  const b1=cscale(z1,k1),b2=cscale(z2,k2),b3=cscale(z3,k3);
+  const s=cadd(cadd(b1,b2),b3);
+  const t=cscale(csqrt(cadd(cadd(cmul(b1,b2),cmul(b2,b3)),cmul(b3,b1))),2);
+  return [cscale(cadd(s,t),1/k4),cscale(cadd(s,C(-t.re,-t.im)),1/k4)];
+}
+
+// ---- disc automorphism f(z)=(z-a)/(1-conj(a) z) ; transforms circle -> circle ----
+function mobiusPt(z,a){ return cdiv(csub(z,a), csub(C(1,0), cmul(cconj(a),z))); }
+function mobiusCircle(cz,cr,a){
+  const pts=[0,2.0944,4.1888].map(ang=>mobiusPt(cadd(cz,cscale(cexp(ang),cr)),a));
+  // circumcircle of 3 points
+  const [p1,p2,p3]=pts;
+  const ax=p1.re,ay=p1.im,bx=p2.re,by=p2.im,cx=p3.re,cy=p3.im;
+  const d=2*(ax*(by-cy)+bx*(cy-ay)+cx*(ay-by));
+  if(Math.abs(d)<1e-12)return {z:cz,r:cr};
+  const ux=((ax*ax+ay*ay)*(by-cy)+(bx*bx+by*by)*(cy-ay)+(cx*cx+cy*cy)*(ay-by))/d;
+  const uy=((ax*ax+ay*ay)*(cx-bx)+(bx*bx+by*by)*(ax-cx)+(cx*cx+cy*cy)*(bx-ax))/d;
+  const ctr=C(ux,uy),rad=cabs(csub(p1,ctr));
+  return {z:ctr,r:rad};
+}
+
+// ---- full-disc ring seed with continuous Mobius variance ----
+function buildSeed(n,varAmt,vang){
+  const s=Math.sin(Math.PI/n), rho=s/(1+s), d=1-rho, rc=1-2*rho;
+  const base=[{k:-1,z:C(0,0)}];
+  for(let k=0;k<n;k++){const a=2*Math.PI*k/n;base.push({k:1/rho,z:cscale(cexp(a),d)});}
+  base.push({k:1/rc,z:C(0,0)}); // central
+  const a=cscale(cexp(vang*Math.PI/180), 0.42*Math.tanh(1.8*varAmt)/Math.tanh(1.8)); // saturating shift: largest circle stays bounded even at v=1
+  const out=[];
+  for(const o of base){
+    if(o.k<0){out.push([-1,C(0,0)]);continue;} // outer maps to itself
+    const m=mobiusCircle(o.z,Math.abs(1/o.k),a);
+    out.push([1/m.r, m.z]);
+  }
+  return out; // [outer, ring*n, central]
+}
+function seedMetrics(seed){
+  const rs=seed.slice(1).map(s=>Math.abs(1/s[0])).sort((a,b)=>b-a);
+  const mean=rs.reduce((x,y)=>x+y,0)/rs.length;
+  const v=rs.reduce((x,y)=>x+(y-mean)*(y-mean),0)/rs.length;
+  return {rs,v};
+}
+
+function buildGasket(n,maxgen,rmin,varAmt,vang,intSeed){
+  rmin=rmin*(1-0.45*varAmt);  // adaptive: compressed side keeps filling at high variance
+  const out=[],seen=new Set();
+  const key=(k,z)=>`${z.re.toFixed(5)},${z.im.toFixed(5)},${k.toFixed(4)}`;
+  let seed, triples;
+  if(intSeed){
+    // classic integer quadruple (−1,2,2,3): every curvature in the gasket is an integer
+    seed=[[-1,C(0,0)],[2,C(-0.5,0)],[2,C(0.5,0)],[3,C(0,2/3)],[3,C(0,-2/3)]];
+    triples=[[0,1,3],[0,2,3],[0,1,4],[0,2,4],[1,2,3],[1,2,4]];
+  }else{
+    seed=buildSeed(n,varAmt,vang);
+    triples=null; // ring topology handled below
+  }
+  for(let i=1;i<seed.length;i++){out.push({z:seed[i][1],r:Math.abs(1/seed[i][0]),g:0,k:seed[i][0]});seen.add(key(seed[i][0],seed[i][1]));}
+  let calls=0;
+  function rec(t1,t2,t3,gen){
+    if(gen>maxgen||calls>90000)return;calls++;
+    const [kp]=dk(t1[0],t2[0],t3[0]);
+    if(kp<=0||kp>1/rmin)return;
+    for(const z4 of dz(t1[0],t2[0],t3[0],kp,t1[1],t2[1],t3[1])){
+      const r4=1/kp;if(r4<rmin)continue;
+      let good=true;
+      for(const t of [t1,t2,t3]){const dd=cabs(csub(z4,t[1])),rr=Math.abs(1/t[0]);
+        if(!(Math.abs(dd-(rr+r4))<3e-3||Math.abs(dd-Math.abs(rr-r4))<3e-3)){good=false;break;}}
+      if(!good)continue;
+      const kk=key(kp,z4);if(seen.has(kk))continue;seen.add(kk);
+      out.push({z:z4,r:r4,g:gen,k:kp});const nt=[kp,z4];
+      rec(t1,t2,nt,gen+1);rec(t1,nt,t3,gen+1);rec(nt,t2,t3,gen+1);
+    }
+  }
+  if(triples){
+    for(const [a,b,c] of triples) rec(seed[a],seed[b],seed[c],1);
+  }else{
+    const central=seed.length-1;
+    for(let i=0;i<n;i++){
+      const a=1+i,b=1+(i+1)%n;
+      rec(seed[a],seed[b],seed[central],1); // inner triangle
+      rec(seed[a],seed[b],seed[0],1);       // boundary triangle
+    }
+  }
+  let maxg=0;for(const o of out)if(o.g>maxg)maxg=o.g;
+  return {circles:out,maxg};
+}
+
+// ---- palettes: arrays of [r,g,b] stops, interpolated ----
+const PALETTES={
+  aurora:[[8,16,40],[20,90,140],[30,180,170],[120,230,160],[230,250,210]],
+  ember: [[10,6,10],[70,18,30],[170,40,40],[240,120,40],[255,225,140]],
+  abyss: [[4,6,18],[18,30,70],[40,70,140],[80,140,210],[180,220,255]],
+  viridis:[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],
+  sunset:[[20,12,40],[90,30,90],[200,60,90],[250,140,70],[255,220,120]],
+  mono:  [[18,18,20],[70,72,78],[130,134,142],[190,194,202],[238,240,245]],
+};
+function lerp(a,b,t){return a+(b-a)*t;}
+function sampleP(name,u){
+  const ps=PALETTES[name]||PALETTES.aurora;u=Math.max(0,Math.min(1,u));
+  const x=u*(ps.length-1),i=Math.floor(x),f=x-i,j=Math.min(i+1,ps.length-1);
+  return [Math.round(lerp(ps[i][0],ps[j][0],f)),Math.round(lerp(ps[i][1],ps[j][1],f)),Math.round(lerp(ps[i][2],ps[j][2],f))];
+}
+
+let G=null;
+function rebuild(){
+  const n=+$('ring').value, v=+$('var').value, vang=+$('vang').value;
+  const intSeed=$('intSeed').checked;
+  G=buildGasket(n,+$('gen').value,+$('rmin').value,intSeed?0:v,vang,intSeed);
+  if(intSeed){
+    const ks=G.circles.map(o=>Math.round(o.k)).sort((a,b)=>a-b);
+    const res=[...new Set(ks.map(k=>((k%24)+24)%24))].sort((a,b)=>a-b);
+    $('seedInfo').innerHTML=`<b>整数种子</b> (−1,2,2,3)　<b>曲率</b> ${ks[0]}…${ks[ks.length-1]}　<b>模板</b> ${G.circles.length} 圆<br><b>剩余类 mod 24</b>：仅 {${res.join(', ')}} 出现 — 其余 ${24-res.length} 类被同余障碍排除（局部-整体猜想）`;
+  }else{
+    const m=seedMetrics(buildSeed(n,v,vang));
+    $('seedInfo').innerHTML=`<b>种子半径</b> [${m.rs.slice(0,5).map(r=>r.toFixed(2)).join(', ')}${m.rs.length>5?'…':''}]　<b>方差</b> ${m.v.toFixed(4)}　<b>模板</b> ${G.circles.length} 圆`;
+  }
+}
+
+function draw(ctx,time,opt){
+  const W=ctx.canvas.width,H=ctx.canvas.height;
+  ctx.fillStyle='#06070a';ctx.fillRect(0,0,W,H);
+  const M=18,S=(Math.min(W,H)-2*M)/2,cx=W/2,cy=H/2;
+  const X=x=>cx+S*x,Y=y=>cy+S*y,RR=r=>S*r;
+  const maxg=G.maxg,maxnest=opt.nest;
+  function hsl2rgb(h,s,l){ // h in [0,360)
+    h=((h%360)+360)%360;const c=(1-Math.abs(2*l-1))*s,x=c*(1-Math.abs((h/60)%2-1)),m=l-c/2;
+    let r,g,b;
+    if(h<60){r=c;g=x;b=0;}else if(h<120){r=x;g=c;b=0;}else if(h<180){r=0;g=c;b=x;}
+    else if(h<240){r=0;g=x;b=c;}else if(h<300){r=x;g=0;b=c;}else{r=c;g=0;b=x;}
+    return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)];
+  }
+  function colorOf(nest,gen,k){
+    if(opt.grad==='mod'){
+      // congruence-class coloring: same residue mod m = same hue (golden-angle spacing)
+      const m=opt.kmod, res=((Math.round(k)%m)+m)%m;
+      let [r,g,b]=hsl2rgb(res*137.508, 0.72, 0.56);
+      if(opt.alt&&nest%2===1){r=Math.round(r*0.55);g=Math.round(g*0.55);b=Math.round(b*0.55);}
+      return [r,g,b];
+    }
+    let u;
+    if(opt.grad==='nest')u=maxnest>0?nest/maxnest:0;
+    else if(opt.grad==='gen')u=gen/Math.max(maxg,1);
+    else u=0.5*(maxnest>0?nest/maxnest:0)+0.5*(gen/Math.max(maxg,1));
+    let [r,g,b]=sampleP(opt.palette,u);
+    if(opt.alt&&nest%2===1){r=Math.round(r*0.6);g=Math.round(g*0.6);b=Math.round(b*0.6);}
+    return [r,g,b];
+  }
+  const items=[];
+  const cullWorld=0.7/S;                       // GPU-style: skip sub-pixel circles
+  let maxTR=0;for(const o of G.circles)if(o.r>maxTR)maxTR=o.r;
+  function place(nest,center,scale,spin){
+    const rot=cexp(spin);
+    for(const o of G.circles){
+      const R=scale*o.r;
+      if(R<cullWorld) continue;               // cull invisible
+      const Z=cadd(center,cscale(cmul(rot,o.z),scale));
+      items.push({x:Z.re,y:Z.im,r:R,nest,g:o.g,k:o.k});
+      if(nest<opt.nest && R*maxTR*0.93>=cullWorld){   // prune dead branches
+        const omega=opt.dir*opt.baseW*Math.pow(opt.accel,nest+1);
+        place(nest+1,Z,R*0.93,spin+opt.dir*0.45+time*omega);
+      }
+    }
+  }
+  place(0,C(0,0),1.0,time*opt.dir*opt.baseW);
+  items.sort((a,b)=>b.r-a.r);
+  if(opt.glow)ctx.globalCompositeOperation='source-over';
+  for(const it of items){
+    const rr=RR(it.r);if(rr<0.35)continue;
+    const [r,g,b]=colorOf(it.nest,it.g,it.k);
+    ctx.beginPath();ctx.arc(X(it.x),Y(it.y),rr,0,2*Math.PI);
+    ctx.fillStyle=`rgb(${r},${g},${b})`;ctx.fill();
+    if(opt.outline){ctx.lineWidth=Math.max(rr*0.025,0.25);ctx.strokeStyle='rgba(0,0,0,0.45)';ctx.stroke();}
+    // integer curvature label (lattice structure): each circle's curvature in its own gasket frame
+    if(opt.showK && rr>10){
+      const lum=0.299*r+0.587*g+0.114*b;
+      ctx.fillStyle=lum>140?'rgba(10,10,14,0.9)':'rgba(240,244,255,0.92)';
+      const fs=Math.min(Math.max(rr*0.55,9),30);
+      ctx.font=`600 ${fs.toFixed(0)}px system-ui,Georgia,serif`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(String(Math.round(it.k)),X(it.x),Y(it.y));
+    }
+  }
+  // outer ring with subtle glow
+  ctx.lineWidth=2;ctx.strokeStyle='rgba(180,200,255,0.85)';
+  if(opt.glow){ctx.shadowColor='rgba(120,160,255,0.6)';ctx.shadowBlur=18;}
+  ctx.beginPath();ctx.arc(cx,cy,S,0,2*Math.PI);ctx.stroke();ctx.shadowBlur=0;
+  $('badge').textContent=`${items.length.toLocaleString()} 圆 · 嵌套 ${opt.nest} · 环 ${$('ring').value}`;
+}
+
+// ---- controllers ----
+const ctx=$('cv').getContext('2d');
+let playing=true,dirSign=1,gradMode='both';
+function setLbl(id){const e=$(id);if(!e)return;const v=e.value;
+  if(id==='rmin'){$(id+'v').textContent=Number(v).toFixed(3);return;}
+  if(/^(w|acc|var)$/.test(id)){$(id+'v').textContent=Number(v).toFixed(2);return;}
+  $(id+'v').textContent=v;}
+['ring','var','vang','nest','gen','rmin','w','acc'].forEach(id=>{const e=$(id);
+  e.addEventListener('input',()=>{setLbl(id);if(/^(ring|var|vang|gen|rmin)$/.test(id))rebuild();});setLbl(id);});
+$('palette').addEventListener('change',()=>{});
+document.querySelectorAll('#gradMode button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#gradMode button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');gradMode=b.dataset.v;}));
+$('play').addEventListener('click',e=>{playing=!playing;e.target.textContent=playing?'⏸ 暂停':'▶ 播放';if(playing)requestAnimationFrame(loop);});
+$('dir').addEventListener('click',()=>{dirSign*=-1;$('dir').textContent=(dirSign>0?'↻':'↺')+' 方向';});
+$('export').addEventListener('click',()=>{const a=document.createElement('a');a.download='nested_apollonian.png';a.href=$('cv').toDataURL('image/png');a.click();});
+$('intSeed').addEventListener('change',rebuild);
+
+let t0=performance.now();
+function loop(now){
+  const time=(now-t0)/1000;
+  draw(ctx,time,{
+    nest:+$('nest').value,baseW:+$('w').value,accel:+$('acc').value,rmin:+$('rmin').value,
+    dir:dirSign,palette:$('palette').value,grad:gradMode,
+    outline:$('outline').checked,alt:$('alt').checked,glow:$('glow').checked,
+    showK:$('showK').checked,kmod:+$('kmod').value
+  });
+  if(playing)requestAnimationFrame(loop);
+}
+rebuild();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

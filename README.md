@@ -1,6 +1,18 @@
 # Abstract-Algebra
 
-抽象代数相关的计算实验与几何可视化。收录庞加莱圆盘与上半平面的对应着色，以及 SL₂(ℤ) 基本域的独立互动展开，展示 Möbius 变换、双曲测地线及逐区域色彩层次。
+抽象代数相关的计算实验与几何可视化。收录 Steiner 与 Pappus 圆链、嵌套阿波罗尼斯垫片、庞加莱圆盘与上半平面的对应着色，以及 SL₂(ℤ) 基本域的独立互动展开。
+
+## 公开互动演示
+
+**[进入完整演示目录](https://eliguli712.github.io/Abstract-Algebra/)**
+
+| 实验 | 公开运行 | 独立 HTML |
+| --- | --- | --- |
+| Steiner 与 Pappus 圆链 · v5 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/circle-chains/steiner-pappus-v5.html) | [下载／查看源码](circle-chains/steiner-pappus-v5.html) |
+| 嵌套阿波罗尼斯垫片 · v2 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/circle-chains/nested-apollonian-v2.html) | [下载／查看源码](circle-chains/nested-apollonian-v2.html) |
+| SL₂(ℤ) 上半平面展开 | [打开演示](https://eliguli712.github.io/Abstract-Algebra/sl2z/) | [下载／查看源码](sl2z/index.html) |
+
+圆链页面支持独立调参、逐层旋转、暂停、反向与 PNG 导出。两个导入的 HTML 保持作者提供的原始版本；[操作说明与来源校验](docs/CIRCLE_CHAINS.md)列出各项控件和 SHA-256。所有独立互动页面可下载后离线打开。
 
 ![庞加莱圆盘与上半平面的自适应彩虹着色](assets/poincare_adaptive_rainbow.png)
 
@@ -72,4 +84,5 @@ python poincare_face_shading_2.py --help
 | [assets/poincare_adaptive_rainbow.png](assets/poincare_adaptive_rainbow.png) | 已提交的高分辨率示例图 |
 
 分隔深度是相对于基点、由当前绘制圆弧计算的计数。分区和微小区域填充采用有限栅格近似；完整定义及使用边界见[方法说明](docs/POINCARE_SHADING.md)。
+
 
